@@ -1,0 +1,20 @@
+Ext.define('PET.model.PaymentInfoMD',{
+	extend:'Ext.data.Model',
+	config:{
+		fields:[
+		{name:'PetType',type:'string'},
+		{name:'PetName',type:'string'},
+		{name:'Breed',type:'string'},
+		{name:'PolicyNumber',type:'string'},
+		{name:'CurrentDue',type:'float'},
+		{name:'Outstanding',type:'float'},
+		{name:'TotalDue',type:'float'},
+		{name:'NextPayment',type:'float'},
+		{name:'Scheduled',type:'date'},
+		{name:'PaymentMethod',type:'string'},
+		{name:'WithdrawalDay',type:'int'},
+		{name:'PaymentMethodId',type:'string'}
+		]
+	}
+
+});

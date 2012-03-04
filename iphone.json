@@ -1,0 +1,21 @@
+{
+	"versionString":"1.0",
+	"applicationName":"Sencha Native",
+	"applicationId":"com.sencha.NativeTest",
+	"inputPath":"/Users/daiquan1121/Sites/MemberPortal3",
+    "outputPath":"/Users/daiquan1121/Sites/iphoneJson/MemberPortal3",
+    
+    "iconName": "icon.png",
+	"configuration":"Debug",
+	"platform":"iOS",
+	"deviceType":"iPhone",
+	
+	"certificateAlias":"iPhone Developer",
+	
+	"orientations": [
+	    "portrait",
+		"landscapeLeft",
+		"landscapeRight",
+		"portraitUpsideDown"
+	]
+}
