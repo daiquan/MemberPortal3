@@ -37,8 +37,7 @@ Ext.define('PET.view.ClaimVW', {
 					store:'ClaimST',
 					//plugins: [new Ext.plugin.PullRefresh()],
 					itemTpl:'{claimNumber} - {petName} - {received} - {claimAmount} - {paidAmount} - {status}'
-				},
-				toolbarMenu
+				}
 			]		
    }
 });

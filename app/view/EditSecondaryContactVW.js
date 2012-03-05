@@ -44,7 +44,12 @@ var secondaryContactForm = {
 Ext.define('PET.view.EditSecondaryContactVW', {
 	id:"EditSecondaryContactVW",
     extend: 'Ext.form.Panel',
-		alias: 'widget.EditSecondaryContactVW',
+		xtype: 'EditSecondaryContactVW',
+		requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldSet',
+        'Ext.field.Select'
+		],
     config: {
       fullscreen: true,
  	   items: 

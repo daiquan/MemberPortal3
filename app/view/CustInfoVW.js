@@ -102,6 +102,11 @@ Ext.define('PET.view.CustInfoVW', {
 	id:"CustInfoVW",
     extend: 'Ext.Panel',
 		xtype:'CustInfoVW',
+		requires: [
+		    'Ext.data.Store',
+		    'Ext.List',
+				'Ext.ActionSheet'
+		],
     config: {
 
       title  : 'Customer',
@@ -125,6 +130,10 @@ Ext.define('PET.view.CustInfoVW', {
  	   			        ui: 'plain',
  	   							docked:'right',
  	   							handler:function(){
+									try
+									{
+										
+									
  	   								var action=Ext.Viewport.items.get('AddContactActionSheet');
  	   								if(!action){
  	   									action=Ext.create('Ext.ActionSheet',{
@@ -151,6 +160,11 @@ Ext.define('PET.view.CustInfoVW', {
 
  	   								} //end if
  	   								action.show();
+									}
+									catch(e)
+									{
+										alert(e);
+									}
  	   							}
  	   						}
 

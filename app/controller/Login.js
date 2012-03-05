@@ -78,6 +78,9 @@ Ext.define('PET.controller.Login',{
 		},
 		LoginSuccess:function(response,homeVW)
 		{
+try
+{
+	
 
 			if(response.GenerateAPITokenJsonResult.ResponseMessageHeader.IsSuccess)
 			{
@@ -92,7 +95,11 @@ Ext.define('PET.controller.Login',{
 				isAuthenticated=false;
 				alert('login failed');
 			}
-
+}
+catch(e)
+{
+	alert(e);
+}
 			
 		}
 

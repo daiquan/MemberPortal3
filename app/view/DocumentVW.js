@@ -29,8 +29,7 @@ Ext.define('PET.view.DocumentVW', {
 					store:'DocumentST',
 					itemTpl:'{publishDate} - {documentTitle} - <a href="#">download</a> - <tpl if=isNew>New</tpl>'
 					
-				},
-				toolbarMenu
+				}
 			]		
    }
 });

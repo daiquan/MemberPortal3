@@ -48,7 +48,13 @@ var primaryContactForm = {
 Ext.define('PET.view.EditPrimaryContactVW', {
 	id:"EditPrimaryContactVW",
     extend: 'Ext.form.Panel',
-		alias: 'widget.EditPrimaryContactVW',
+		xtype: 'EditPrimaryContactVW',
+		requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldSet',
+        'Ext.field.Select'
+		],
+    
     config: {
       fullscreen: true,
  	   items: 

@@ -81,7 +81,14 @@ var mailingAddressForm={
 Ext.define('PET.view.EditMailingAddressVW', {
 	id:"EditMailingAddressVW",
     extend: 'Ext.form.Panel',
-		alias: 'widget.EditMailingAddressVW',
+		xtype: 'EditMailingAddressVW',
+		requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldSet',
+				'Ext.field.Text',
+        'Ext.field.Select',
+				'Ext.field.DatePicker'
+		],
     config: {
       fullscreen: true,
  	   items: 

@@ -29,8 +29,13 @@ Ext.define('PET.controller.Home',{
 
             '#lstPrimaryContact':{
 								'itemtap':function(item,i,target,record){
-									
-                 this.changeView('EditPrimaryContactVW','left',record);
+									try{
+										 this.changeView('EditPrimaryContactVW','left',record);
+									}
+									catch(e){
+										alert(e);
+									}
+                
 								 
             	}
 						},

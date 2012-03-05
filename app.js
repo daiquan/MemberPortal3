@@ -4,59 +4,27 @@ Ext.Loader.setConfig({
         Ext: 'touch/src'
     }
 });
-
-var toolbarMenu = {
-	xtype:'toolbar',
-	docked:'bottom',
-	layout:{
-		pack:'center',
-		align:'center'
-	},
-	defaults: {
-      //xtype:'button'
-			iconMask:true
-  },
-	items: 
-		[
-			{
-				iconCls:'home',
-				title:'Home',
-				go:'left_HomeVW'
-				
-			},
-			{
-				iconCls:'user',
-				title:'Customer Info',
-				id:'btnCustomerInfo'
-				//go:'left_CustInfoVW'
-			
-				
-			},
-			{
-				iconCls:'credit_card',
-				title:'Payment',
-				id:'btnPaymentInfo'
-				//go:'left_PaymentInfoVW'
-			},
-			{
-				iconCls:'dog-paw',
-				title:'Pet Info',
-				id:'btnPetInfo'
-				//go:'left_PetInfoVW'
-			},
-			{
-				iconCls:'download',
-				title:'Document'
-				//go:'left_DocumentVW'
-			},
-			{
-				iconCls:'compose',
-				title:'Claim'
-				//go:'left_ClaimVW'
-			}
-		]
-	
-};
+Ext.require([
+    'Ext.form.Panel',
+    'Ext.form.FieldSet',
+    'Ext.field.Text',
+    'Ext.field.Password',
+    'Ext.field.Email',
+    'Ext.field.Url',
+    'Ext.field.Checkbox',
+    'Ext.field.Spinner',
+    'Ext.field.Select',
+    'Ext.field.Hidden',
+    'Ext.field.DatePicker',
+    'Ext.field.TextArea',
+    'Ext.field.Slider',
+    'Ext.field.Toggle',
+    'Ext.field.Radio',
+    'Ext.Button',
+		'Ext.List',
+		'Ext.Toolbar',
+    'Ext.data.Store'
+]);
 
 var isAuthenticated=false;
 var mpToken = null;

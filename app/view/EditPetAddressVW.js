@@ -82,7 +82,13 @@ var petAddressForm={
 Ext.define('PET.view.EditPetAddressVW', {
 	id:"EditPetAddressVW",
     extend: 'Ext.form.Panel',
-		alias: 'widget.EditPetAddressVW',
+		xtype: 'EditPetAddressVW',
+		requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldSet',
+        'Ext.field.Select',
+				'Ext.field.DatePicker'
+		],
     config: {
       fullscreen: true,
  	   items: 
