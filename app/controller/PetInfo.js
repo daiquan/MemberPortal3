@@ -139,20 +139,7 @@ Ext.define('PET.controller.PetInfo',{
 						
         }); //end control
     },
-		loadPetInfo:function(){
-			this.getApplication().getController('Home').callAPIService('GET','MemberPortalService','GetPetInfo',{htoken:mpToken,returnType:'json'},function(response){
-				console.log('get pet info result:')
-				console.log(response);
-				if(response.GetPetInfoResult.ResponseMessageHeader.IsSuccess)
-				{
-					var petInfoData = response.GetPetInfoResult.ResponseMessageBody.MessageBody[0];
-					var pstore =Ext.getStore('PetInfoST');
-					pstore.setData(petInfoData.Pets);
-					var listPet = Ext.getCmp('lstPetInfo');
-					listPet.refresh();
-				}
-			});
-		},
+
 		changeView:function(viewName,direction,data){
 			var home;
 			home = this.getApplication().getController('Home');

@@ -23,7 +23,6 @@ Ext.define('PET.controller.Login',{
         
         console.log('init login controller.');
 
-      
         this.control({
           '#btnLogin':{
 							'tap':function(item){
@@ -78,28 +77,30 @@ Ext.define('PET.controller.Login',{
 		},
 		LoginSuccess:function(response,homeVW)
 		{
-try
-{
+
+			try
+			{
 	
 
-			if(response.GenerateAPITokenJsonResult.ResponseMessageHeader.IsSuccess)
+						if(response.GenerateAPITokenJsonResult.ResponseMessageHeader.IsSuccess)
+						{
+							isAuthenticated = true;
+							var token       = response.GenerateAPITokenJsonResult.ResponseMessageBody.MessageBody[0].Message;
+							mpToken         = token;
+							console.log('received token:'+mpToken);
+				
+			       homeVW.changeView(profileName+'.MainVW');
+						}
+						else{
+							isAuthenticated = false;
+							alert('login failed');
+						}
+			}
+			catch(e)
 			{
-				isAuthenticated=true;
-				var token = response.GenerateAPITokenJsonResult.ResponseMessageBody.MessageBody[0].Message;
-				mpToken=token;
-				console.log('received token:'+mpToken);
-			
-       homeVW.changeView('MainVW');
+				alert(e);
 			}
-			else{
-				isAuthenticated=false;
-				alert('login failed');
-			}
-}
-catch(e)
-{
-	alert(e);
-}
+
 			
 		}
 

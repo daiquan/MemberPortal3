@@ -29,32 +29,18 @@ Ext.require([
 var isAuthenticated=false;
 var mpToken = null;
 var reLoadPage=true;
+var profileName=Ext.os.deviceType.toLowerCase();
+var previewsView = [];
+var mainViewHistory=[];
 Ext.application({
     name: 'PET',
-controllers:['Login','Home','PaymentInfo','PetInfo','Claim','Document'],
+profiles: ['Phone', 'Tablet','Desktop'],
+
+controllers:['Login','Home','PaymentInfo','PetInfo','Claim','Document','Customer'],
 models:['CustInfoMD','AddressMD','ContactMD','PaymentInfoMD','PaymentMethodMD','ClaimFormMD','ClaimMD','CoverageMD','DocumentMD','MicrochipMD','PaymentHistoryMD','PetInfoMD','PolicyDetailMD','PracticeMD','LoginMD','ParamMD'],
 stores:['CustInfoST','CustPrimaryContactST','CustSecondaryContactST','CustPetAddressST','CustMailingAddressST','DocumentST','ClaimST','ClaimFormST','PaymentInfoST','PaymentMethodST','PaymentHistoryST','PetInfoST','MicrochipST','PracticeST','PolicyDetailST','CoverageST','LoginST'],
-views:['MainVW','HomeVW','CustInfoVW','EditPrimaryContactVW','EditSecondaryContactVW','EditPetAddressVW','EditMailingAddressVW','PetInfoVW','PolicyVW','PracticeVW','MicrochipVW','EditMicrochipVW','EditPracticeVW','NewPracticeVW','PaymentInfoVW','PaymentHistoryVW','ChangeWithdrawalDayVW','PaymentMethodVW','RegisterVW','LoginVW','ForgotPasswordVW','ChangePasswordVW','DocumentVW','ClaimFormVW','ClaimVW'],
+views:['HomeVW','CustInfoVW','EditPrimaryContactVW','EditSecondaryContactVW','EditPetAddressVW','EditMailingAddressVW','PetInfoVW','PolicyVW','PracticeVW','MicrochipVW','EditMicrochipVW','EditPracticeVW','NewPracticeVW','PaymentInfoVW','PaymentHistoryVW','ChangeWithdrawalDayVW','PaymentMethodVW','RegisterVW','LoginVW','ForgotPasswordVW','ChangePasswordVW','DocumentVW','ClaimFormVW','ClaimVW']
 
 
-    launch: function() {
-       	Ext.Viewport.setLayout({type: 'card', animation: {type: 'slide',direction:'left'}});
-				
-				var landingPage;
-				//isAuthenticated=true;
-       if(isAuthenticated){
-					
-					var landingPage=Ext.create('PET.view.MainVW');
-				}
-				else{
-					//var landingPage = this.createView('HomeVW');
-					//console.log(app);
-					
-					var landingPage=Ext.create('PET.view.LoginVW');
-				}
-       
-      
-       
-       Ext.Viewport.add(landingPage);
-    }
+
 });

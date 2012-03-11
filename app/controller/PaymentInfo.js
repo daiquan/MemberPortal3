@@ -164,22 +164,7 @@ Ext.define('PET.controller.PaymentInfo',{
         }); //end control
 				
     },
-		loadPaymentInfo:function()
-		{
-			this.getApplication().getController('Home').callAPIService('GET','MemberPortalService','GetPaymentInfo',{htoken:mpToken,returnType:'json'},function(response){
-				console.log('get payment info result:')
-				console.log(response);
-				if(response.GetPaymentInfoResult.ResponseMessageHeader.IsSuccess)
-				{
-					var paymentInfoData = response.GetPaymentInfoResult.ResponseMessageBody.MessageBody[0];
-					var pstore =Ext.getStore('PaymentInfoST');
-					pstore.setData(paymentInfoData.Details);
-					var listPayment = Ext.getCmp('lstPaymentInfo');
-					listPayment.refresh();
-				}
-			});
-		},
-		
+
 		goToActivePaymentCard:function(btn){
 			var cards = Ext.getCmp('paymentMethodCards');
 			

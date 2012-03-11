@@ -25,9 +25,14 @@ Ext.define('PET.view.PaymentInfoVW', {
 	id:"PaymentInfoVW",
     extend: 'Ext.Panel',
 		xtype: 'PaymentInfoVW',
+		requires: [
+		    'Ext.data.Store',
+		    'Ext.List',
+				'Ext.ActionSheet'
+		],
     config: {
 			title:'Payment',
-			iconCls: 'twitter',
+			iconCls: 'info',
 			layout:'fit',
  	   items: 
 			[
@@ -41,12 +46,7 @@ Ext.define('PET.view.PaymentInfoVW', {
 						xtype:'button'
 					},
 					items:[
-					{
-						
-						iconCls:'reply',
-						go:'right_HomeVW',
-						docked:'left'
-					},
+
 					{
 						iconCls:'search',
 						go:'left_PaymentHistoryVW',

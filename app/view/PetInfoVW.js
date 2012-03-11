@@ -30,9 +30,14 @@ Ext.define('PET.view.PetInfoVW', {
 	id:"PetInfoVW",
     extend: 'Ext.Panel',
 		xtype:'PetInfoVW',
+		requires: [
+		    'Ext.data.Store',
+		    'Ext.List',
+				'Ext.ActionSheet'
+		],
     config: {
 			title:'Pet',
-			iconCls: 'twitter',
+			iconCls: 'star',
 			layout:'fit',
  	   items: 
 			[
@@ -46,12 +51,7 @@ Ext.define('PET.view.PetInfoVW', {
 						xtype:'button'
 					},
 					items:[
-					{
-						
-						iconCls:'reply',
-						go:'right_HomeVW',
-						docked:'left'
-					}
+
 					
 					]
 				

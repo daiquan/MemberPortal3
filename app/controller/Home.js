@@ -27,42 +27,27 @@ Ext.define('PET.controller.Home',{
       
         this.control({
 
-            '#lstPrimaryContact':{
-								'itemtap':function(item,i,target,record){
-									try{
-										 this.changeView('EditPrimaryContactVW','left',record);
-									}
-									catch(e){
-										alert(e);
-									}
-                
-								 
-            	}
-						},
-						'#lstSecondaryContact':{
-								'itemtap':function(item,i,target,record){
-                 this.changeView('EditSecondaryContactVW','left',record);
-								 
-            	}
-						},
-						'#lstPetAddress':{
-								'itemtap':function(item,i,target,record){
-                 this.changeView('EditPetAddressVW','left',record);
-								 
-            	}
-						},
-						'#lstMailingAddress':{
-								'itemtap':function(item,i,target,record){
-                 this.changeView('EditMailingAddressVW','left',record);
-								 
-            	}
-						},
-						'#MainVW':{
+					'tabpanel[name=mainView]':{
 							'activeitemchange':function(i,v,ov){
+								if(Ext.Array.contains(mainViewHistory,v.getItemId()))
+								{
+									return;
+								}
 								if(v.getItemId() == 'CustInfoVW')
 								{
 									//alert(v.getItemId());
 									this.loadCustomerInfo();
+									
+								}
+								else if(v.getItemId() == 'PaymentInfoVW')
+								{
+									//alert(v.getItemId());
+									this.loadPaymentInfo();
+								}
+								else if(v.getItemId() == 'PetInfoVW')
+								{
+									//alert(v.getItemId());
+									this.loadPetInfo();
 								}
 								
 							}
@@ -82,96 +67,7 @@ Ext.define('PET.controller.Home',{
                 this.changeView(viewName,direction)
 
                 }
-            },
-						'#btnAddPrimaryContact':{
-							'tap':function(){
-								//Ext.getCmp('btnAddContact').actions.hide();
-								Ext.Viewport.items.get('AddContactActionSheet').hide();
-
-								this.changeView('EditPrimaryContactVW');
-
-							}
-						},
-						'#btnAddSecondaryContact':{
-							'tap':function(){
-								Ext.Viewport.items.get('AddContactActionSheet').hide();
-								sContact=Ext.getCmp('EditSecondaryContactVW');
-								sContact.setRecord(null);
-
-								this.changeView('EditSecondaryContactVW');
-
-							}
-						},
-
-						'#EditPrimaryContactVW':{
-  
-							'activate':function(){
-								var actionSheet = Ext.Viewport.items.get('AddContactActionSheet');
-								if(actionSheet!=null)
-								{
-									actionSheet.hide();
-								}
-					
-								
-								this.activateContact('EditPrimaryContactVW');
-								
-							},  
-
-
-         
-							'deactivate':function()
-							{
-								var pContact = Ext.getCmp('EditPrimaryContactVW');
-								pContact.setRecord(null);
-							}
-						},
-
-						'#EditSecondaryContactVW':{
-							'activate':function(){
-								Ext.Viewport.items.get('AddContactActionSheet').hide();
-									this.activateContact('EditSecondaryContactVW');
-							},
-							'deactivate':function()
-							{
-								var pcontact = Ext.getCmp('EditSecondaryContactVW');
-								var store = Ext.getStore('')
-								pcontact.reset();
-							}
-						},
-						'#btnPCAction':{
-							'tap':function(btn){
-								if(btn.getText() == 'Create')
-								{
-									this.createContact('EditPrimaryContactVW');
-								}
-								if(btn.getText() == 'Update')
-								{
-									this.updateContact('EditPrimaryContactVW');
-								}
-								
-							}
-						},
-						'#btnSCAction':{
-							'tap':function(){
-								this.createContact('EditSecondaryContactVW');
-							}
-						},
-						'#btnPCDelete':{
-							'tap':function(){
-								this.removeContact('EditPrimaryContactVW');
-							}
-						},
-
-						'#btnSCDelete':{
-							'tap':function(){
-								this.removeContact('EditSecondaryContactVW');
-							}
-						},
-						'#tabCustomerInfo':{
-							'select':function(){
-								this.changeView('CustInfoVW')
-							}
-						}
+            }
 
 						
         }); //end control
@@ -204,7 +100,7 @@ Ext.define('PET.controller.Home',{
 						lstS.refresh();
 						lstPA.refresh();
 						lstMA.refresh();
-
+						mainViewHistory.push('CustInfoVW');
 						
 					}
 					else{
@@ -212,81 +108,38 @@ Ext.define('PET.controller.Home',{
 					}
 				});
 		},
-		removeContact:function(contactView){
-			console.log('tap delete contact');
-			var pcontact = Ext.getCmp(contactView);
-			var record =pcontact.getRecord().data;
-			var data = record.ContactId;
-			this.callAPIService('DELETE','MemberPortalService','DeleteContact',data,function(response,page){
+		loadPaymentInfo:function()
+		{
+			this.getApplication().getController('Home').callAPIService('GET','MemberPortalService','GetPaymentInfo',{htoken:mpToken,returnType:'json'},function(response){
+				console.log('get payment info result:')
 				console.log(response);
-				page.changeView('CustInfoVW','right');
-				page.loadCustomerInfo();
+				if(response.GetPaymentInfoResult.ResponseMessageHeader.IsSuccess)
+				{
+					var paymentInfoData = response.GetPaymentInfoResult.ResponseMessageBody.MessageBody[0];
+					var pstore =Ext.getStore('PaymentInfoST');
+					pstore.setData(paymentInfoData.Details);
+					var listPayment = Ext.getCmp('lstPaymentInfo');
+					listPayment.refresh();
+					mainViewHistory.push('PaymentInfoVW');
+				}
 			});
 		},
-		createContact:function(contactView){
-			console.log('tap btnPCAction');
-			var pcontact = Ext.getCmp(contactView);
-			var data = pcontact.getValues();
-			
-			this.callAPIService('POST','MemberPortalService','AddContact',data,function(response,page){
+		loadPetInfo:function(){
+			this.getApplication().getController('Home').callAPIService('GET','MemberPortalService','GetPetInfo',{htoken:mpToken,returnType:'json'},function(response){
+				console.log('get pet info result:')
 				console.log(response);
-				reLoadPage=true;
-				page.changeView('MainVW','right');
-				page.loadCustomerInfo();
+				if(response.GetPetInfoResult.ResponseMessageHeader.IsSuccess)
+				{
+					var petInfoData = response.GetPetInfoResult.ResponseMessageBody.MessageBody[0];
+					var pstore =Ext.getStore('PetInfoST');
+					pstore.setData(petInfoData.Pets);
+					var listPet = Ext.getCmp('lstPetInfo');
+					listPet.refresh();
+					mainViewHistory.push('PetInfoVW');
+				}
 			});
-
-			
 		},
-		updateContact:function(contactView){
-			console.log('tap btnPCAction');
-			var pcontact = Ext.getCmp(contactView);
-			var values = pcontact.getValues();
-			var data = pcontact.getRecord().data;
-			data.ContactValue = values.ContactValue;
-			data.ContactType=values.ContactType;
-			this.callAPIService('PUT','MemberPortalService','UpdateContact',data,function(response,page){
-				console.log(response);
-				page.changeView('MainVW','right');
-				page.loadCustomerInfo();
-			});
 
-			
-		},
-		activateContact:function(contactView){
-			
-			var btnId=contactView=='EditPrimaryContactVW'?'btnPCAction':'btnSCAction';
-			var titleBarId = contactView=='EditPrimaryContactVW'?'pcTitle':'scTitle';
-			var titleText = contactView=='EditPrimaryContactVW'?'Primary':'Secondary';
-			var pcontact = Ext.getCmp(contactView);
-			var isNew=false;
-			var contactRecord=pcontact.getRecord();
-			
-			
-			
-			if(contactRecord==null)
-			{
-				var newModel = Ext.create('PET.model.ContactMD');
-				pcontact.load(newModel);
-				contactRecord=pcontact.getRecord();
-				isNew=true;
-			}
-			else
-			{
-				var newModel = Ext.create('PET.model.ContactMD',contactRecord.data);
-				pcontact.load(newModel);
-				isNew=false;
-			}
-
-			if (isNew) {
-          Ext.getCmp(titleBarId).setTitle('Create '+titleText+' Contact');
-          Ext.getCmp(btnId).setText('Create');
-          //deleteButton.hide();
-      } else {
-        Ext.getCmp(titleBarId).setTitle('Update '+titleText+' Contact');
-        Ext.getCmp(btnId).setText('Update');
-          //deleteButton.show();
-      }
-		},
     changeView: function(viewName,direction,data) {  
 	     	var activeItem = Ext.Viewport.getActiveItem();
         var card;
@@ -298,7 +151,10 @@ Ext.define('PET.controller.Home',{
 				Ext.Viewport.getLayout().getAnimation().getInAnimation().setDirection(direction);
 				//if(this.)
 
-
+				if(viewName=='MainVW')
+				{
+					viewName = profileName+'_'+viewName;
+				}
 				historyItem=Ext.Viewport.items.get(viewName);
 				if(historyItem!=null)
 				{
@@ -306,6 +162,7 @@ Ext.define('PET.controller.Home',{
 					card=historyItem;
 				}
 				else{
+
 					this.getEventDispatcher().addListener('element', '#'+viewName, 'swipe', this.onTouchPadEvent, this);
 					card = Ext.create('PET.view.'+viewName);
 					Ext.Viewport.add(card);
@@ -386,4 +243,4 @@ Ext.define('PET.controller.Home',{
 
 		}
 });
-var previewsView = [];
+
