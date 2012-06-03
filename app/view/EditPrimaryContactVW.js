@@ -2,6 +2,7 @@
 var primaryContactForm = {
 
 		xtype:'fieldset',
+		id:'pContactFieldSet',
 		defaults:{
 			labelWidth:'40%'
 		},
@@ -38,10 +39,16 @@ var primaryContactForm = {
 			]
 		},
 		{
-			xtype:'textfield',
+			xtype:'numberfield',
 			label:'Contact',
-			name:'ContactValue'
+			name:'ContactValue',
+			placeHolder:'2041234567'
+		},
+		{
+			xtype:'ErrorFieldCMP',
+			id:'ContactValueErrorField'
 		}
+
 		
 		]
 };
@@ -97,6 +104,7 @@ Ext.define('PET.view.EditPrimaryContactVW', {
 					]
 				},
 				primaryContactForm
+
 			]		
    }
 });

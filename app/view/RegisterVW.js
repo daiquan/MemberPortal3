@@ -1,6 +1,6 @@
 Ext.define('PET.view.RegisterVW', {
 	id:"RegisterVW",
-    extend: 'Ext.Panel',
+    extend: 'Ext.form.Panel',
 		alias: 'widget.RegisterVW',
     config: {
       fullscreen: true,
@@ -28,11 +28,13 @@ Ext.define('PET.view.RegisterVW', {
 					items:[
 					{
 						xtype:'textfield',
-						label:'Customer #'
+						label:'Customer #',
+						name:'custNum'
 					},
 					{
 						xtype:'textfield',
-						label:'Email'
+						label:'Email',
+						name:'email'
 					}
 
 					

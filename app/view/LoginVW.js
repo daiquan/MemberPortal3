@@ -37,7 +37,7 @@ Ext.define('PET.view.LoginVW', {
 						xtype:'emailfield',
 						label:'Email',
 						name:'email',
-						value:'913116@pet.com'
+						value:'616498@pet.com'
 					},
 					{
 				

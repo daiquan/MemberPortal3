@@ -1,12 +1,12 @@
 {
 	"versionString":"1.0",
-	"applicationName":"Sencha Native",
-	"applicationId":"com.sencha.NativeTest",
+	"applicationName":"member portal",
+	"applicationId":"com.petsecure.memberportal",
 	"inputPath":"/Users/daiquan1121/Sites/MemberPortal3",
     "outputPath":"/Users/daiquan1121/Sites/iphoneJson/MemberPortal3",
-    
+    "certificatePath":"/Users/daiquan1121/Sites/MemberPortal3/Certificates.p12",
     "iconName": "icon.png",
-	"configuration":"Debug",
+	"configuration":"Release",
 	"platform":"iOS",
 	"deviceType":"iPhone",
 	

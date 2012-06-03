@@ -1,6 +1,6 @@
 Ext.define('PET.view.ForgotPasswordVW', {
 	id:"ForgotPasswordVW",
-    extend: 'Ext.Panel',
+    extend: 'Ext.form.Panel',
 		alias: 'widget.ForgotPasswordVW',
     config: {
       fullscreen: true,
@@ -28,7 +28,8 @@ Ext.define('PET.view.ForgotPasswordVW', {
 					items:[
 					{
 						xtype:'textfield',
-						label:'Email'
+						label:'Email',
+						name:'email'
 					}
 
 					

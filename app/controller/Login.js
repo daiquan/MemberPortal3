@@ -5,7 +5,9 @@ Ext.define('PET.controller.Login',{
       profile: Ext.os.deviceType.toLowerCase()
   },
 
-
+	mixins:{
+		mixHome:'PET.controller.Home'
+	},
  /*
     refs:[
          {
@@ -37,27 +39,34 @@ Ext.define('PET.controller.Login',{
 					'#btnLoginRegister':{
 							'tap':function(item){
 								
-               this.changeView('RegisterVW');
+               this.mixins.mixHome.changeView('RegisterVW');
 							 
           	}
 					},
 					'#btnLoginForgotPassword':{
 							'tap':function(item){
 							
-               this.changeView('ForgotPasswordVW');
+               this.mixins.mixHome.changeView('ForgotPasswordVW');
 							 
           	}
+					},
+					'#btnRegister':{
+							'tap':function(item){
+							 this.registerCustomer();
+							 
+          	}
+					},
+					'#btnForgotPassword':{
+						'tap':function(item){
+							this.forgotPassword();
+						}
 					}
 
 						
         }); //end control
 
     },
-		changeView:function(viewName,direction,data){
-			var home;
-			home = this.getApplication().getController('Home');
-			home.changeView(viewName,direction,data);
-		},
+
 		loginMemberPortal:function(){
 			var loginvw = Ext.getCmp('LoginVW');
 			var loginData = loginvw.getValues();
@@ -71,7 +80,7 @@ Ext.define('PET.controller.Login',{
 				BrandId:"61E735F2-E2A1-43A3-9E98-6D69DF303F9D",
 				Password:hashedPW,
 				UserName:email};
-			this.getApplication().getController('Home').callAPIService('POST','AuthService','GenerateAPITokenJson',params,this.LoginSuccess);
+			this.mixins.mixHome.callAPIService('POST','AuthService','GenerateAPIToken',params,this.LoginSuccess);
 			
 			
 		},
@@ -80,12 +89,12 @@ Ext.define('PET.controller.Login',{
 
 			try
 			{
-	
+						console.log(response);
 
-						if(response.GenerateAPITokenJsonResult.ResponseMessageHeader.IsSuccess)
+						if(response.ResponseMessageHeader.IsSuccess)
 						{
 							isAuthenticated = true;
-							var token       = response.GenerateAPITokenJsonResult.ResponseMessageBody.MessageBody[0].Message;
+							var token       = response.ResponseMessageBody.MessageBody[0].Message;
 							mpToken         = token;
 							console.log('received token:'+mpToken);
 				
@@ -102,7 +111,73 @@ Ext.define('PET.controller.Login',{
 			}
 
 			
+		},
+		registerCustomer:function(){
+			var regvw = Ext.getCmp('RegisterVW');
+			var regData = regvw.getValues();
+			var email = regData.email;
+			var cn=regData.custNum;
+			params={BrandId:'61E735F2-E2A1-43A3-9E98-6D69DF303F9D',CustomerNumber:cn,Email:email
+				};
+				this.mixins.mixHome.callAPIService('POST','AuthService','RegisterCustomer',params,this.registerCustomerSuccess);
+		},
+		registerCustomerSuccess:function(response,loginc){
+			
+			try
+			{
+						console.log(response);
+
+						if(response.ResponseMessageHeader.IsSuccess)
+						{
+							
+							var msg = response.ResponseMessageBody.MessageBody[0].Message;
+							alert(msg);
+			       
+						}
+						else{
+						
+							alert('register failed');
+						}
+						loginc.changeView('LoginVW');
+			}
+			catch(e)
+			{
+				alert(e);
+			}
+		},
+		forgotPassword:function(){
+			var vw = Ext.getCmp('ForgotPasswordVW');
+			var data = vw.getValues();
+			var email = data.email;
+			params={BrandId:'61E735F2-E2A1-43A3-9E98-6D69DF303F9D',Email:email
+				};
+				this.mixins.mixHome.callAPIService('POST','AuthService','ResetPassword',params,this.forgotPasswordSuccess);
+		},
+		forgotPasswordSuccess:function(response,loginc){
+			
+			try
+			{
+						console.log(response);
+
+						if(response.ResponseMessageHeader.IsSuccess)
+						{
+							
+							var msg = response.ResponseMessageBody.MessageBody[0].Message;
+							alert(msg);
+			       
+						}
+						else{
+						
+							alert('reset password failed');
+						}
+						loginc.changeView('LoginVW');
+			}
+			catch(e)
+			{
+				alert(e);
+			}
 		}
+		
 
 });
 

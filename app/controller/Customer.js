@@ -1,9 +1,12 @@
 Ext.define('PET.controller.Customer',{
     extend:'Ext.app.Controller',
+		requires:['PET.model.ContactMD'],
   config: {
       profile: Ext.os.deviceType.toLowerCase()
   },
-
+  mixins:{
+		mixHome:'PET.controller.Home'
+	},
 
  /*
     refs:[
@@ -30,7 +33,7 @@ Ext.define('PET.controller.Customer',{
             '#lstPrimaryContact':{
 								'itemtap':function(item,i,target,record){
 									try{
-										 this.changeView('EditPrimaryContactVW','left',record);
+										 this.mixins.mixHome.changeView('EditPrimaryContactVW','left',record);
 									}
 									catch(e){
 										alert(e);
@@ -41,19 +44,19 @@ Ext.define('PET.controller.Customer',{
 						},
 						'#lstSecondaryContact':{
 								'itemtap':function(item,i,target,record){
-                 this.changeView('EditSecondaryContactVW','left',record);
+                 this.mixins.mixHome.changeView('EditSecondaryContactVW','left',record);
 								 
             	}
 						},
 						'#lstPetAddress':{
 								'itemtap':function(item,i,target,record){
-                 this.changeView('EditPetAddressVW','left',record);
+                 this.mixins.mixHome.changeView('EditPetAddressVW','left',record);
 								 
             	}
 						},
 						'#lstMailingAddress':{
 								'itemtap':function(item,i,target,record){
-                 this.changeView('EditMailingAddressVW','left',record);
+                 this.mixins.mixHome.changeView('EditMailingAddressVW','left',record);
 								 
             	}
 						},
@@ -62,7 +65,7 @@ Ext.define('PET.controller.Customer',{
 								//Ext.getCmp('btnAddContact').actions.hide();
 								Ext.Viewport.items.get('AddContactActionSheet').hide();
 
-								this.changeView('EditPrimaryContactVW');
+								this.mixins.mixHome.changeView('EditPrimaryContactVW');
 
 							}
 						},
@@ -72,7 +75,7 @@ Ext.define('PET.controller.Customer',{
 								sContact=Ext.getCmp('EditSecondaryContactVW');
 								sContact.setRecord(null);
 
-								this.changeView('EditSecondaryContactVW');
+								this.mixins.mixHome.changeView('EditSecondaryContactVW');
 
 							}
 						},
@@ -143,7 +146,7 @@ Ext.define('PET.controller.Customer',{
 						},
 						'#tabCustomerInfo':{
 							'select':function(){
-								this.changeView('CustInfoVW')
+								this.mixins.mixHome.changeView('CustInfoVW')
 							}
 						}
 
@@ -155,7 +158,7 @@ Ext.define('PET.controller.Customer',{
 			var pcontact = Ext.getCmp(contactView);
 			var record =pcontact.getRecord().data;
 			var data = record.ContactId;
-			this.callAPIService('DELETE','MemberPortalService','DeleteContact',data,function(response,page){
+			this.mixins.mixHome.callAPIService('DELETE','MemberPortalService','DeleteContact',data,function(response,page){
 				console.log(response);
 				page.changeView('MainVW','right');
 				page.loadCustomerInfo();
@@ -165,8 +168,19 @@ Ext.define('PET.controller.Customer',{
 			console.log('tap btnPCAction');
 			var pcontact = Ext.getCmp(contactView);
 			var data = pcontact.getValues();
+			//validation todo
+/*
+			var newContact = Ext.create('PET.model.ContactMD', data);
+			var errors = newContact.validate();
+			if(!errors.isValid())
+			{
+				this.showErrors('pContactFieldSet',errors)
+				return;
+			}*/
+
+
 			
-			this.callAPIService('POST','MemberPortalService','AddContact',data,function(response,page){
+			this.mixins.mixHome.callAPIService('POST','MemberPortalService','AddContact',data,function(response,page){
 				console.log(response);
 				reLoadPage=true;
 				page.changeView('MainVW','right');
@@ -182,7 +196,7 @@ Ext.define('PET.controller.Customer',{
 			var data = pcontact.getRecord().data;
 			data.ContactValue = values.ContactValue;
 			data.ContactType=values.ContactType;
-			this.callAPIService('PUT','MemberPortalService','UpdateContact',data,function(response,page){
+			this.mixins.mixHome.callAPIService('PUT','MemberPortalService','UpdateContact',data,function(response,page){
 				console.log(response);
 				page.changeView('MainVW','right');
 				page.loadCustomerInfo();
@@ -225,16 +239,29 @@ Ext.define('PET.controller.Customer',{
           //deleteButton.show();
       }
 		},
-		changeView:function(viewName,direction,data){
-			var home;
-			home = this.getApplication().getController('Home');
-			home.changeView(viewName,direction,data);
-		},
-		callAPIService:function(httpMethod,serviceName,methodName,params,successFnc){
-			var home;
-			home = this.getApplication().getController('Home');
-			home.callAPIService(httpMethod,serviceName,methodName,params,successFnc);
-		}
+		showErrors: function(fieldSetId,errors) {
+        var fieldset = Ext.getCmp(fieldSetId);
+				var errorMessage='';
+        fieldset.items.each(function(field) {
+            var fieldErrors = errors.getByField(field.getName());
+
+            if (fieldErrors.length > 0) {
+                var errorField = Ext.getCmp(field.getName()+'ErrorField');
+                field.addCls('invalid-field');
+								for(i=0;i<fieldErrors.length;i++)
+								{
+									errorMessage+=fieldErrors[i]._field+' '+fieldErrors[i]._message+'; ';
+									
+								}
+								errorField.setHtml(errorMessage);
+            
+                errorField.show();
+            } else {
+               //errorField.hide();
+            }
+        }, this);
+        fieldset.setInstructions("Please amend the flagged fields");
+    }
 
 });
 

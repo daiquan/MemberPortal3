@@ -220,9 +220,7 @@ Ext.define('PET.controller.Home',{
 			{
 				Ext.Ajax.request({
 					url:'http://staging.wfic.ca/api/'+serviceName+'/'+methodName,
-					jsonData:{
-						request:params
-					},
+					jsonData:params,
 					params:{
 						'htoken':mpToken,
 						'returnType':'json'
