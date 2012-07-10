@@ -4,7 +4,11 @@ Ext.define('PET.model.LoginMD',{
 		fields:[
 		{name:'email',type:'string'},
 		{name:'password',type:'string'}
-		]
+		],
+        validations: [
+            {type: 'email', field: 'email'},
+            {type: 'length', field: 'password',min:6}
+        ]
 	}
 
 });

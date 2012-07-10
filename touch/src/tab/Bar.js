@@ -14,7 +14,10 @@ Ext.define('Ext.tab.Bar', {
     requires: ['Ext.tab.Tab'],
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'tabbar',
 
         // @private
@@ -29,14 +32,18 @@ Ext.define('Ext.tab.Bar', {
 
     eventedConfig: {
         /**
-         * @cfg {Ext.Component} activeTab
+         * @cfg {Number/String/Ext.Component} activeTab
+         * The initially activated tab. Can be specified as numeric index,
+         * component ID or as the component instance itself.
          * @accessor
+         * @evented
          */
         activeTab: null
     },
 
     /**
      * @event tabchange
+     * Fired when active tab changes.
      * @param {Ext.tab.Bar} this
      * @param {Ext.tab.Tab} newTab The new Tab
      * @param {Ext.tab.Tab} oldTab The old Tab
@@ -62,14 +69,14 @@ Ext.define('Ext.tab.Bar', {
     /**
      * @private
      */
-    applyActiveTab: function(activeTab, oldActiveTab) {
-        if (!activeTab && activeTab !== 0) {
+    applyActiveTab: function(newActiveTab, oldActiveTab) {
+        if (!newActiveTab && newActiveTab !== 0) {
             return;
         }
 
-        var activeTabInstance = this.parseActiveTab(activeTab);
+        var newTabInstance = this.parseActiveTab(newActiveTab);
 
-        if (!activeTabInstance) {
+        if (!newTabInstance) {
             // <debug warn>
             if (oldActiveTab) {
                 Ext.Logger.warn('Trying to set a non-existent activeTab');
@@ -77,7 +84,7 @@ Ext.define('Ext.tab.Bar', {
             // </debug>
             return;
         }
-        return activeTabInstance;
+        return newTabInstance;
     },
 
     /**

@@ -7,7 +7,8 @@ Ext.define('PET.profile.Tablet', {
     },
 
     isActive: function() {
-        return Ext.os.is.Tablet;
+        //return Ext.os.is.Tablet;
+        return true;
     },
 
 
@@ -17,7 +18,7 @@ Ext.define('PET.profile.Tablet', {
 				var landingPage;
 				//isAuthenticated=true;
        if(isAuthenticated){
-					
+					console.log('access tablet view');
 					var landingPage=Ext.create('PET.view.tablet.MainVW');
 				}
 				else{
@@ -25,6 +26,8 @@ Ext.define('PET.profile.Tablet', {
 					//console.log(app);
 					
 					var landingPage=Ext.create('PET.view.LoginVW');
+                    var loginModel = Ext.create('PET.model.LoginMD',{email:'616498@pet.com',password:'123456'});
+                    landingPage.setRecord(loginModel);
 				}
        
       

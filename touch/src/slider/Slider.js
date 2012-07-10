@@ -14,7 +14,7 @@ Ext.define('Ext.slider.Slider', {
     /**
     * @event change
     * Fires when the value changes
-    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} this
     * @param {Ext.slider.Thumb} thumb The thumb being changed
     * @param {Number} newValue The new value
     * @param {Number} oldValue The old value
@@ -23,7 +23,7 @@ Ext.define('Ext.slider.Slider', {
     /**
     * @event dragstart
     * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} this
     * @param {Ext.slider.Thumb} thumb The thumb being dragged
     * @param {Array} value The start value
     * @param {Ext.EventObject} e
@@ -32,7 +32,7 @@ Ext.define('Ext.slider.Slider', {
     /**
     * @event drag
     * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} this
     * @param {Ext.slider.Thumb} thumb The thumb being dragged
     * @param {Ext.EventObject} e
     */
@@ -40,7 +40,7 @@ Ext.define('Ext.slider.Slider', {
     /**
     * @event dragend
     * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} this
     * @param {Ext.slider.Thumb} thumb The thumb being dragged
     * @param {Array} value The end value
     * @param {Ext.EventObject} e
@@ -100,6 +100,12 @@ Ext.define('Ext.slider.Slider', {
 
         /**
          * @cfg {Boolean/Object} animation
+         * The animation to use when moving the slider. Possible properties are:
+         *
+         * - duration
+         * - easingX
+         * - easingY
+         *
          * @accessor
          */
         animation: true
@@ -187,7 +193,10 @@ Ext.define('Ext.slider.Slider', {
 
     refreshElementWidth: function() {
         this.elementWidth = this.element.dom.offsetWidth;
-        this.thumbWidth = this.getThumb(0).getElementWidth();
+        var thumb = this.getThumb(0);
+        if (thumb) {
+            this.thumbWidth = thumb.getElementWidth();
+        }
     },
 
     refresh: function() {
@@ -246,7 +255,7 @@ Ext.define('Ext.slider.Slider', {
 
         draggable.setOffset(value * offsetValueRatio, null, animation);
 
-        values[index] = this.constrainValue(draggable.getOffset().x / offsetValueRatio);
+        values[index] = value;
     },
 
     onThumbDragEnd: function(thumb, e) {
@@ -518,9 +527,9 @@ Ext.define('Ext.slider.Slider', {
 }, function() {
     //<deprecated product=touch since=2.0>
     /**
-     * @member Ext.slider.Slider
      * @cfg {Boolean} animationDuration
-     * @deprecated 2.0.0 please use set the duration property on the animation config
+     * Animation duration in ms.
+     * @removed 2.0.0 Use the duration property on the animation config instead.
      */
     Ext.deprecateProperty(this, 'animationDuration', null, "Ext.slider.Slider.animationDuration has been removed");
     //</deprecated>

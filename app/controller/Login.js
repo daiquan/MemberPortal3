@@ -52,7 +52,7 @@ Ext.define('PET.controller.Login',{
 					},
 					'#btnRegister':{
 							'tap':function(item){
-							 this.registerCustomer();
+							 this.registerCustomer(); 
 							 
           	}
 					},
@@ -69,17 +69,20 @@ Ext.define('PET.controller.Login',{
 
 		loginMemberPortal:function(){
 			var loginvw = Ext.getCmp('LoginVW');
-			var loginData = loginvw.getValues();
-			//913116@pet.com
-			var email = loginData.email;
-			var pw=loginData.password;
-			var hashedPW = CalculateSHA512Hash(email,pw);
-			//var paramEmail = Ext.create('ParamMD'{name:'email',value:email});
-			//var paramPassword = Ext.create('ParamMD'{name:'password',value:hashedPW});
+            var data = loginvw.getValues();
+            var record = loginvw.getRecord();
+            record.set(data);
+            if(!this.mixins.mixHome.validateRecord(record)){
+                return;
+            }
+
+			var hashedPW = CalculateSHA512Hash(record.data.email,record.data.password);
+
 			params={APIName:"Member Portal",
 				BrandId:"61E735F2-E2A1-43A3-9E98-6D69DF303F9D",
 				Password:hashedPW,
-				UserName:email};
+				UserName:record.data.email};
+
 			this.mixins.mixHome.callAPIService('POST','AuthService','GenerateAPIToken',params,this.LoginSuccess);
 			
 			

@@ -152,7 +152,10 @@ Ext.define('Ext.form.Panel', {
      */
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'form',
 
         /**
@@ -183,7 +186,7 @@ Ext.define('Ext.form.Panel', {
          * go or enter inside a textfield.
          * @accessor
          */
-        submitOnAction : true,
+        submitOnAction: false,
 
         /**
          * @cfg {Ext.data.Model} record The model instance of this form. Can by dynamically set at any time
@@ -197,7 +200,10 @@ Ext.define('Ext.form.Panel', {
          */
         method: 'post',
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         scrollable: {
             translationMethod: 'scrollposition'
         }
@@ -214,11 +220,6 @@ Ext.define('Ext.form.Panel', {
     initialize: function() {
         var me = this;
         me.callParent();
-
-        me.on({
-            action: 'onFieldAction',
-            scope : me
-        });
 
         me.element.on({
             submit: 'onSubmit',
@@ -262,15 +263,22 @@ Ext.define('Ext.form.Panel', {
         var me = this;
         if (e && !me.getStandardSubmit()) {
             e.stopEvent();
+        } else {
+            this.submit();
         }
-
-        me.fireAction('submit', [me, me.getValues(true), e], 'doSubmit');
-
     },
 
-    doSubmit: function(me, values, e) {
-        if (e) {
-            e.stopEvent();
+    updateSubmitOnAction: function(newSubmitOnAction) {
+        if (newSubmitOnAction) {
+            this.on({
+                action: 'onFieldAction',
+                scope: this
+            });
+        } else {
+            this.un({
+                action: 'onFieldAction',
+                scope: this
+            });
         }
     },
 
@@ -373,6 +381,19 @@ Ext.define('Ext.form.Panel', {
                 form.action = options.url;
             }
 
+            // Spinner fields must have their components enabled *before* submitting or else the value
+            // will not be posted.
+            var fields = this.query('spinnerfield'),
+                ln = fields.length,
+                i, field;
+
+            for (i = 0; i < ln; i++) {
+                field = fields[i];
+                if (!field.getDisabled()) {
+                    field.getComponent().setDisabled(false);
+                }
+            }
+
             form.method = (options.method || form.method).toLowerCase();
             form.submit();
         }
@@ -455,7 +476,7 @@ Ext.define('Ext.form.Panel', {
      */
     setValues: function(values) {
         var fields = this.getFields(),
-            name, field, value;
+            name, field, value, ln, i, f;
 
         values = values || {};
 
@@ -463,21 +484,39 @@ Ext.define('Ext.form.Panel', {
             if (values.hasOwnProperty(name)) {
                 field = fields[name];
                 value = values[name];
+
                 if (field) {
+                    // If there are multiple fields with the same name. Checkboxes, radio fields and maybe event just normal fields..
                     if (Ext.isArray(field)) {
-                        field.forEach(function(f) {
+                        ln = field.length;
+
+                        // Loop through each of the fields
+                        for (i = 0; i < ln; i++) {
+                            f = field[i];
+
                             if (f.isRadio) {
+                                // If it is a radio field just use setGroupValue which will handle all of the radio fields
                                 f.setGroupValue(value);
-                            } else if (Ext.isArray(values[name])) {
-                                f.setChecked((value.indexOf(f.getValue()) != -1));
+                            } else if (f.isCheckbox) {
+                                if (Ext.isArray(value)) {
+                                   f.setChecked((value.indexOf(f._value) != -1));
+                               } else {
+                                   f.setChecked((value == f._value));
+                               }
                             } else {
-                                f.setChecked((value == f.getValue()));
+                                // If it is a bunch of fields with the same name, check if the value is also an array, so we can map it
+                                // to each field
+                                if (Ext.isArray(value)) {
+                                    f.setValue(value[i]);
+                                }
                             }
-                        });
+                        }
                     } else {
-                        if (field.setChecked) {
+                        if (field.isRadio || field.isCheckbox) {
+                            // If the field is a radio or a checkbox
                             field.setChecked(value);
                         } else {
+                            // If just a normal field
                             field.setValue(value);
                         }
                     }
@@ -490,67 +529,80 @@ Ext.define('Ext.form.Panel', {
 
     /**
      * Returns an object containing the value of each field in the form, keyed to the field's name.
-     * For groups of checkbox fields with the same name, it will be arrays of values. For examples:
-
-     <pre><code>
-     {
-         name: "Jacky Nguyen", // From a TextField
-         favorites: [
-             'pizza',
-             'noodle',
-             'cake'
-         ]
-     }
-     </code></pre>
-
+     * For groups of checkbox fields with the same name, it will be arrays of values. For example:
+     *
+     *     {
+     *         name: "Jacky Nguyen", // From a TextField
+     *         favorites: [
+     *             'pizza',
+     *             'noodle',
+     *             'cake'
+     *         ]
+     *     }
+     *
      * @param {Boolean} enabled <tt>true</tt> to return only enabled fields
      * @return {Object} Object mapping field name to its value
      */
     getValues: function(enabled) {
         var fields = this.getFields(),
             values = {},
-            field, name, ln, i;
+            isArray = Ext.isArray,
+            field, value, addValue, bucket, name, ln, i;
 
-        for (name in fields) {
-            if (fields.hasOwnProperty(name)) {
-                if (Ext.isArray(fields[name])) {
-                    values[name] = [];
-
-                    ln = fields[name].length;
-
-                    for (i = 0; i < ln; i++) {
-                        field = fields[name][i];
-
-                        if (!field.getChecked) {
-                            values[name] = field.getValue();
-
-                            //<debug>
-                            throw new Error("Ext.form.Panel: [getValues] You have multiple fields with the same 'name' configuration of '" + name + "' in your form panel (#" + this.id + ").");
-                            //</debug>
-
-                            break;
-                        }
-
-                        if (!(enabled && field.getDisabled())) {
-                            if (field.isRadio) {
-                                values[name] = field.getGroupValue();
-                            } else {
-                                values[name].push(field.getValue());
-                            }
-                        }
+        // Function which you give a field and a name, and it will add it into the values
+        // object accordingly
+        addValue = function(field, name) {
+            if (field.isCheckbox) {
+                value = field.getSubmitValue();
+            } else {
+                value = field.getValue();
+            }
 
 
+            if (!(enabled && field.getDisabled())) {
+                // RadioField is a special case where the value returned is the fields valUE
+                // ONLY if it is checked
+                if (field.isRadio) {
+                    if (field.isChecked()) {
+                        values[name] = value;
                     }
                 } else {
-                    field = fields[name];
-
-                    if (!(enabled && field.getDisabled())) {
-                        if (field.isCheckbox) {
-                            values[name] = (field.getChecked()) ? field.getValue() : null;
-                        } else {
-                            values[name] = field.getValue();
+                    // Check if the value already exists
+                    bucket = values[name];
+                    if (bucket) {
+                        // if it does and it isn't an array, we need to make it into an array
+                        // so we can push more
+                        if (!isArray(bucket)) {
+                            bucket = values[name] = [bucket];
                         }
+
+                        // Check if it is an array
+                        if (isArray(bucket)) {
+                            // Concat it into the other values
+                            bucket = values[name] = bucket.concat(value);
+                        } else {
+                            // If it isn't an array, just pushed more values
+                            bucket.push(value);
+                        }
+                    } else {
+                        values[name] = value;
                     }
+                }
+            }
+        };
+
+        // Loop through each of the fields, and add the values for those fields.
+        for (name in fields) {
+            if (fields.hasOwnProperty(name)) {
+                field = fields[name];
+
+                if (isArray(field)) {
+                    ln = field.length;
+                    for (i = 0; i < ln; i++) {
+                        addValue(field[i], name);
+                    }
+                } else {
+                    addValue(field, name);
                 }
             }
         }
@@ -747,7 +799,6 @@ Ext.define('Ext.form.Panel', {
     getNextField: function() {
         var fields = this.getFieldsArray(),
             focusedField = this.getFocusedField(),
-            ln = fields.length,
             index;
 
         if (focusedField) {
@@ -784,7 +835,6 @@ Ext.define('Ext.form.Panel', {
     getPreviousField: function() {
         var fields = this.getFieldsArray(),
             focusedField = this.getFocusedField(),
-            ln = fields.length,
             index;
 
         if (focusedField) {
@@ -815,27 +865,25 @@ Ext.define('Ext.form.Panel', {
     }
 }, function() {
 
-    /**
-     * @member Ext.form.Panel
-     * @method loadRecord
-     * @deprecated 2.0.0 please use #setRecord
-     */
-
-    /**
-     * @member Ext.form.Panel
-     * @method loadModel
-     * @deprecated 2.0.0 please use #setRecord
-     */
-
-    /**
-     * @member Ext.form.Panel
-     * @method load
-     * @deprecated 2.0.0 please use #setRecord
-     */
     //<deprecated product=touch since=2.0>
     Ext.deprecateClassMethod(this, {
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         loadRecord: 'setRecord',
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         loadModel: 'setRecord',
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         load: 'setRecord'
     });
 

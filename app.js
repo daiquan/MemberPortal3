@@ -29,15 +29,18 @@ Ext.require([
 var isAuthenticated=false;
 var mpToken = null;
 var reLoadPage=true;
-var profileName=Ext.os.deviceType.toLowerCase();
+//var profileName=Ext.os.deviceType.toLowerCase();
+var profileName = 'tablet';
 var previewsView = [];
 var mainViewHistory=[];
+var errorMessages = [];
+var apiRoot = 'http://staging.wfic.ca/api'
 Ext.application({
     name: 'PET',
-profiles: ['Phone', 'Tablet','Desktop'],
+profiles: [ 'Tablet','Phone','Desktop'],
 
 controllers:['Login','Home','PaymentInfo','PetInfo','Claim','Document','Customer'],
-models:['ErrorMessageMD','CustInfoMD','AddressMD','ContactMD','PaymentInfoMD','PaymentMethodMD','ClaimFormMD','ClaimMD','CoverageMD','DocumentMD','MicrochipMD','PaymentHistoryMD','PetInfoMD','PolicyDetailMD','PracticeMD','LoginMD','ParamMD'],
+models:['MenuItem','ErrorMessageMD','CustInfoMD','AddressMD','ContactMD','PaymentInfoMD','PaymentMethodMD','ClaimFormMD','ClaimMD','CoverageMD','DocumentMD','MicrochipMD','PaymentHistoryMD','PetInfoMD','PolicyDetailMD','PracticeMD','LoginMD','ParamMD'],
 stores:['CustInfoST','CustPrimaryContactST','CustSecondaryContactST','CustPetAddressST','CustMailingAddressST','DocumentST','ClaimST','ClaimFormST','PaymentInfoST','PaymentMethodST','PaymentHistoryST','PetInfoST','MicrochipST','PracticeST','PolicyDetailST','CoverageST','LoginST'],
 views:['HomeVW','ErrorFieldCMP','CustInfoVW','EditPrimaryContactVW','EditSecondaryContactVW','EditPetAddressVW','EditMailingAddressVW','PetInfoVW','PolicyVW','PracticeVW','MicrochipVW','EditMicrochipVW','EditPracticeVW','NewPracticeVW','PaymentInfoVW','PaymentHistoryVW','ChangeWithdrawalDayVW','PaymentMethodVW','RegisterVW','LoginVW','ForgotPasswordVW','ChangePasswordVW','DocumentVW','ClaimFormVW','ClaimVW']
 

@@ -149,32 +149,33 @@ Ext.define('Ext.Container', {
     config: {
         /**
          * @cfg {String/Object/Boolean} cardSwitchAnimation
+         * Animation to be used during transitions of cards.
          * @removed 2.0.0 Please use {@link Ext.layout.Card#animation} instead
          */
 
         /**
          * @cfg {Object/String} layout Configuration for this Container's layout. Example:
          *
-         *    Ext.create('Ext.Container', {
-         *        layout: {
-         *            type: 'hbox',
-         *            align: 'middle'
-         *        },
-         *        items: [
-         *            {
-         *                xtype: 'panel',
-         *                flex: 1,
-         *                style: 'background-color: red;'
-         *            },
-         *            {
-         *                xtype: 'panel',
-         *                flex: 2,
-         *                style: 'background-color: green'
-         *            }
-         *        ]
-         *    });
+         *     Ext.create('Ext.Container', {
+         *         layout: {
+         *             type: 'hbox',
+         *             align: 'middle'
+         *         },
+         *         items: [
+         *             {
+         *                 xtype: 'panel',
+         *                 flex: 1,
+         *                 style: 'background-color: red;'
+         *             },
+         *             {
+         *                 xtype: 'panel',
+         *                 flex: 2,
+         *                 style: 'background-color: green'
+         *             }
+         *         ]
+         *     });
          *
-         * See the layouts guide for more information
+         * See the [Layouts Guide](#!/guide/layouts) for more information
          *
          * @accessor
          */
@@ -321,8 +322,8 @@ Ext.define('Ext.Container', {
         modal: null,
 
         /**
-         * @cfg {Boolean} hideOnMaskTap When using a {@link #modal} Component, setting this to true (the default) will
-         * hide the modal mask and the Container when the mask is tapped on
+         * @cfg {Boolean} hideOnMaskTap When using a {@link #modal} Component, setting this to true will hide the modal
+         * mask and the Container when the mask is tapped on
          * @accessor
          */
         hideOnMaskTap: null
@@ -441,6 +442,9 @@ Ext.define('Ext.Container', {
             if (mask) {
                 container.insertBefore(mask, this);
                 mask.setZIndex(this.getZIndex() - 1);
+                if (this.getHideOnMaskTap()) {
+                    mask.on('tap', 'hide', this, { single: true });
+                }
             }
         }
     },
@@ -453,6 +457,7 @@ Ext.define('Ext.Container', {
             this.painted = false;
 
             if (mask) {
+                mask.un('tap', 'hide', this);
                 container.remove(mask, false);
             }
         }
@@ -465,14 +470,6 @@ Ext.define('Ext.Container', {
 
         if (modal) {
             modal.setZIndex(zIndex - 1);
-        }
-    },
-
-    updateHideOnMaskTap: function(hideOnMaskTap) {
-        var modal = this.getModal();
-
-        if (modal) {
-            modal[hideOnMaskTap ? 'on' : 'un'].call(modal, 'tap', 'hide', this);
         }
     },
 
@@ -654,11 +651,11 @@ Ext.define('Ext.Container', {
     /**
      * Adds one or more Components to this Container. Example:
      *
-     *    var myPanel = Ext.create('Ext.Panel', {
-     *        html: 'This will be added to a Container'
-     *    });
+     *     var myPanel = Ext.create('Ext.Panel', {
+     *         html: 'This will be added to a Container'
+     *     });
      *
-     *    myContainer.add([myPanel])
+     *     myContainer.add([myPanel]);
      *
      * @param {Array} newItems The new items to add to the Container
      */
@@ -716,38 +713,42 @@ Ext.define('Ext.Container', {
     remove: function(item, destroy) {
         var me = this,
             index = me.indexOf(item),
-            innerItems = this.getInnerItems(),
-            innerIndex;
+            innerItems = me.getInnerItems();
 
         if (destroy === undefined) {
             destroy = me.getAutoDestroy();
         }
 
         if (index !== -1) {
-            if (!this.removingAll && innerItems.length > 1 && item === this.getActiveItem()) {
-                this.on({
+            if (!me.removingAll && innerItems.length > 1 && item === me.getActiveItem()) {
+                me.on({
                     activeitemchange: 'doRemove',
-                    scope: this,
+                    scope: me,
                     single: true,
                     order: 'after',
                     args: [item, index, destroy]
                 });
 
-                innerIndex = innerItems.indexOf(item);
-
-                if (innerIndex === 0) {
-                    this.setActiveItem(1);
-                }
-                else {
-                    this.setActiveItem(0);
-                }
+                me.doResetActiveItem(innerItems.indexOf(item));
             }
             else {
-                this.doRemove(item, index, destroy);
+                me.doRemove(item, index, destroy);
+                if (innerItems.length === 0) {
+                    me.setActiveItem(null);
+                }
             }
         }
 
         return me;
+    },
+
+    doResetActiveItem: function(innerIndex) {
+        if (innerIndex === 0) {
+            this.setActiveItem(1);
+        }
+        else {
+            this.setActiveItem(0);
+        }
     },
 
     doRemove: function(item, index, destroy) {
@@ -1069,7 +1070,7 @@ Ext.define('Ext.Container', {
         var layout = this.getLayout();
 
         if (this.isRendered() && item.setRendered(false)) {
-            item.fireAction('renderedchange', [this, item, false], 'onItemRemove', layout, { args: [item, index] });
+            item.fireAction('renderedchange', [this, item, false], 'onItemRemove', layout, { args: [item, index, undefined] });
         }
         else {
             layout.onItemRemove(item, index);
@@ -1179,7 +1180,11 @@ Ext.define('Ext.Container', {
         // Make sure the items are already initialized
         this.getItems();
 
-        if (typeof activeItem == 'number') {
+        // No items left to be active, reset back to 0 on falsy changes
+        if (!activeItem && innerItems.length === 0) {
+            return 0;
+        }
+        else if (typeof activeItem == 'number') {
             activeItem = Math.max(0, Math.min(activeItem, innerItems.length - 1));
             activeItem = innerItems[activeItem];
 
@@ -1465,6 +1470,7 @@ Ext.define('Ext.Container', {
 
             /**
              * @cfg {Boolean/String/Object} scroll
+             * @inheritdoc Ext.Container#scrollable
              * @deprecated 2.0.0 Please use the {@link #scrollable} configuration.
              */
             if (config.scroll) {

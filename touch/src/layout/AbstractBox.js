@@ -1,4 +1,7 @@
 /**
+ * @aside guide layouts
+ * @aside video layouts
+ *
  * AbstractBox is a superclass for the two box layouts:
  *
  * * {@link Ext.layout.HBox hbox}
@@ -36,10 +39,13 @@ Ext.define('Ext.layout.AbstractBox', {
          * @cfg {String} align
          * Controls how the child items of the container are aligned. Acceptable configuration values for this property are:
          *
-         * - **top** : **Default** child items are aligned vertically at the **top** of the container
-         * - **middle** : child items are aligned vertically in the **middle** of the container
+         * - ** start ** : child items are packed together at left side of container
+         * - ** center ** : child items are packed together at mid-width of container
+         * - ** end ** : child items are packed together at right side of container
          * - **stretch** : child items are stretched vertically to fill the height of the container
-         * - **stretchmax** : child items are stretched vertically to the height of the largest item.
+         *
+         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
+         * explanation.
          * @accessor
          */
         align: 'stretch',
@@ -52,6 +58,9 @@ Ext.define('Ext.layout.AbstractBox', {
          * - ** start ** : child items are packed together at left side of container
          * - ** center ** : child items are packed together at mid-width of container
          * - ** end ** : child items are packed together at right side of container
+         *
+         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
+         * explanation.
          * @accessor
          */
         pack: null

@@ -16,7 +16,7 @@ var paymentHistoryList={
 Ext.define('PET.view.PaymentHistoryVW', {
 	id:"PaymentHistoryVW",
     extend: 'Ext.Panel',
-		
+	xtype:'PaymentHistoryVW',
     config: {
 	alias: 'widget.PaymentHistoryVW',
       fullscreen: true,

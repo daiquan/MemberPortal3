@@ -72,7 +72,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
     // private
     getElement: function(el) {
         // Set the shared flyweight dom property to the current element
-        return this.el.attach(el);
+        return this.el.attach(el).synchronize();
     },
 
     // private
@@ -160,7 +160,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
         for (i = 0; i < len; i++) {
             e = els[i];
             if (e) {
-                Ext.EventManager.on(e, eventName, handler, scope || e, opt);
+                e.on(eventName, handler, scope || e, opt);
             }
         }
         return this;

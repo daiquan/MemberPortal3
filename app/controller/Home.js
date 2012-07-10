@@ -21,12 +21,36 @@ Ext.define('PET.controller.Home',{
 
 
     init:function(){
-        
+
         console.log('init home controller.');
 
       
         this.control({
+                    '#tabletMenu':{
+                        leafitemtap: function(me, list, index, item) {
+                         var  viewName =  list.getStore().data.get(index).data.viewName;
+                            var card;
+                        var contentView = Ext.getCmp('tabletContent');
+                            contentView.setActiveItem(index);
 
+                            //me.setDetailContainer(Ext.getCmp('tabletContent'));
+
+//                            historyItem=contentView.items.get(viewName);
+//                            if(historyItem!=null)
+//                            {
+//                                historyItem.show();
+//                            }
+//                            else{
+//                                card = Ext.create('PET.view.'+viewName);
+//                                contentView.items.add(card);
+//                                contentView.setActiveItem(0);
+//                            }
+
+
+
+                            //this.changeView(viewName,direction)
+                        }
+                    },
 					'tabpanel[name=mainView]':{
 							'activeitemchange':function(i,v,ov){
 								if(Ext.Array.contains(mainViewHistory,v.getItemId()))
@@ -239,6 +263,28 @@ Ext.define('PET.controller.Home',{
 			}
 
 
-		}
+		},
+    validateRecord:function(record){
+        var errors = record.validate();
+        for(var i=0;i<errorMessages.length;i++){
+            errorMessages[i].destroy();
+        }
+        errorMessages=[];
+
+        if(!errors.isValid()){
+
+            for(var i=0;i<errors.items.length;i++){
+                var errorCmp = Ext.create('Ext.Component',{itemId:'errorMessage',html:errors.items[i]._field+' '+errors.items[i]._message,style:'background-color:yellow;width:100%;height:20px;'});
+                var errorField = Ext.getCmp('LoginVW').down('[name='+errors.items[i]._field+']');
+                errorCmp.element.insertAfter(errorField.element);
+                errorMessages.push(errorCmp);
+                errorCmp.show();
+            }
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 });
 

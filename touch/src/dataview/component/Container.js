@@ -54,6 +54,15 @@ Ext.define('Ext.dataview.component.Container', {
      */
 
     /**
+     * @event itemsingletap
+     * Fires whenever an item is doubletapped
+     * @param {Ext.dataview.component.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item singletapped
+     * @param {Number} index The index of the item singletapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
      * @event itemdoubletap
      * Fires whenever an item is doubletapped
      * @param {Ext.dataview.component.Container} this
@@ -82,7 +91,9 @@ Ext.define('Ext.dataview.component.Container', {
             touchstart: 'onItemTouchStart',
             touchend: 'onItemTouchEnd',
             tap: 'onItemTap',
+            taphold: 'onItemTapHold',
             touchmove: 'onItemTouchMove',
+            singletap: 'onItemSingleTap',
             doubletap: 'onItemDoubleTap',
             swipe: 'onItemSwipe',
             delegate: '> .' + Ext.baseCSSPrefix + 'data-item',
@@ -142,6 +153,13 @@ Ext.define('Ext.dataview.component.Container', {
             target = e.getTarget(),
             item = Ext.getCmp(target.id);
         me.fireEvent('itemtaphold', me, item, me.indexOf(item), e);
+    },
+
+    onItemSingleTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            item = Ext.getCmp(target.id);
+        me.fireEvent('itemsingletap', me, item, me.indexOf(item), e);
     },
 
     onItemDoubleTap: function(e) {
@@ -239,14 +257,15 @@ Ext.define('Ext.dataview.component.Container', {
     },
 
     getDataItemConfig: function(xtype, record, itemConfig) {
-        var dataview = this.dataview;
-        return {
-            xtype: xtype,
-            record: record,
-            dataview: dataview,
-            itemCls: dataview.getItemCls(),
-            defaults: itemConfig
-        };
+        var dataview = this.dataview,
+            dataItemConfig = {
+                xtype: xtype,
+                record: record,
+                dataview: dataview,
+                itemCls: dataview.getItemCls(),
+                defaults: itemConfig
+            };
+        return Ext.merge(dataItemConfig, itemConfig);
     },
 
     doRemoveItemCls: function(cls) {

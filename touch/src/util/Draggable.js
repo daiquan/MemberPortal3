@@ -59,6 +59,16 @@ Ext.define('Ext.util.Draggable', {
          */
         direction: 'both',
 
+        /**
+         * @cfg {Object/Number} initialOffset
+         * The initial draggable offset.  When specified as Number,
+         * both x and y will be set to that value.
+         */
+        initialOffset: {
+            x: 0,
+            y: 0
+        },
+
         translatable: {}
     },
 
@@ -68,14 +78,21 @@ Ext.define('Ext.util.Draggable', {
 
     DIRECTION_HORIZONTAL: 'horizontal',
 
+    defaultConstraint: {
+        min: { x: -Infinity, y: -Infinity },
+        max: { x: Infinity, y: Infinity }
+    },
+
+    sizeMonitor: null,
+
+    containerSizeMonitor: null,
+
     /**
      * Creates new Draggable.
      * @param {Object} config The configuration object for this Draggable.
      */
     constructor: function(config) {
         var element;
-
-        this.sizeMonitors = {};
 
         this.extraConstraint = {};
 
@@ -115,13 +132,30 @@ Ext.define('Ext.util.Draggable', {
     updateElement: function(element) {
         element.on(this.listeners);
 
-        this.sizeMonitors.element = new Ext.util.SizeMonitor({
+        this.sizeMonitor = new Ext.util.SizeMonitor({
             element: element,
             callback: this.doRefresh,
             scope: this
         });
 
         this.initConfig(this.initialConfig);
+    },
+
+    updateInitialOffset: function(initialOffset) {
+        if (typeof initialOffset == 'number') {
+            initialOffset = {
+                x: initialOffset,
+                y: initialOffset
+            };
+        }
+
+        var offset = this.offset,
+            x, y;
+
+        offset.x = x = initialOffset.x;
+        offset.y = y = initialOffset.y;
+
+        this.getTranslatable().doTranslate(x, y);
     },
 
     updateCls: function(cls) {
@@ -151,8 +185,12 @@ Ext.define('Ext.util.Draggable', {
         return this;
     },
 
-    applyConstraint: function(newConstraint, currentConstraint) {
+    applyConstraint: function(newConstraint) {
         this.currentConstraint = newConstraint;
+
+        if (!newConstraint) {
+            newConstraint = this.defaultConstraint;
+        }
 
         if (newConstraint === 'container') {
             return Ext.merge(this.getContainerConstraint(), this.extraConstraint);
@@ -166,16 +204,14 @@ Ext.define('Ext.util.Draggable', {
     },
 
     getContainerConstraint: function() {
-        var container = this.getContainer();
+        var container = this.getContainer(),
+            element = this.getElement();
 
-        if (!container) {
-            return {
-                min: { x: -Infinity, y: -Infinity },
-                max: { x: Infinity, y: Infinity }
-            };
+        if (!container || !element.dom) {
+            return this.defaultConstraint;
         }
 
-        var dom = this.getElement().dom,
+        var dom = element.dom,
             containerDom = container.dom,
             width = dom.offsetWidth,
             height = dom.offsetHeight,
@@ -195,17 +231,24 @@ Ext.define('Ext.util.Draggable', {
             container = this.getElement().getParent();
 
             if (container) {
-                this.sizeMonitors.container = new Ext.util.SizeMonitor({
+                this.containerSizeMonitor = new Ext.util.SizeMonitor({
                     element: container,
                     callback: this.doRefresh,
                     scope: this
                 });
 
                 this.container = container;
+
+                container.on('destroy', 'onContainerDestroy', this);
             }
         }
 
         return container;
+    },
+
+    onContainerDestroy: function() {
+        delete this.container;
+        delete this.containerSizeMonitor;
     },
 
     detachListeners: function() {
@@ -320,14 +363,12 @@ Ext.define('Ext.util.Draggable', {
     },
 
     refresh: function() {
-        var sizeMonitors = this.sizeMonitors;
-
-        if (sizeMonitors.element) {
-            sizeMonitors.element.refresh();
+        if (this.sizeMonitor) {
+            this.sizeMonitor.refresh();
         }
 
-        if (sizeMonitors.container) {
-            sizeMonitors.container.refresh();
+        if (this.containerSizeMonitor) {
+            this.containerSizeMonitor.refresh();
         }
 
         this.doRefresh();
@@ -350,16 +391,11 @@ Ext.define('Ext.util.Draggable', {
     },
 
     destroy: function() {
-        var sizeMonitors = this.sizeMonitors,
-            translatable = this.getTranslatable();
+        var translatable = this.getTranslatable();
 
-        if (sizeMonitors.element) {
-            sizeMonitors.element.destroy();
-        }
-
-        if (sizeMonitors.container) {
-            sizeMonitors.container.destroy();
-        }
+        Ext.destroy(this.containerSizeMonitor, this.sizeMonitor);
+        delete this.sizeMonitor;
+        delete this.containerSizeMonitor;
 
         var element = this.getElement();
         if (element && !element.isDestroyed) {
